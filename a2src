@@ -1,0 +1,44 @@
+#!/bin/bash
+
+shopt -s expand_aliases
+source ~/.bash_profile
+
+FILE=$1
+GETEXT="${FILE##*.}"
+NOEXT="${FILE%.*}"
+ERROR="a2z"
+
+if [ -z $1 ]
+  then
+    echo "No file supplied."
+    echo "Halted at $ERROR."
+    exit 1
+else
+  # a2z operations
+  echo "a2z $FILE"
+  a2z $FILE
+
+# dex2jar operations
+    if [ $? -eq 0 ]
+      then
+        echo "d2j $NOEXT.zip"
+        d2j $NOEXT.zip
+	echo "Converted dex file from $NOEXT.zip to .jar."
+    else 
+	ERROR="dex2jar"
+	echo "Halted at $ERROR."
+	exit 1
+    fi
+
+# apktool operations
+    if [ $? -eq 0 ]
+      then
+        echo "apktool d $FILE"
+        apktool d $FILE
+	echo "Decompiled $FILE with apktool."
+    else 
+	ERROR="apktool"
+	echo "Halted at $ERROR."
+	exit 1
+    fi
+fi
