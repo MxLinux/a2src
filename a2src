@@ -14,41 +14,41 @@ if [ -z $1 ]
     echo "Halted at $ERROR."
     exit 1
 else
-  # a2z operations
-  echo "Converting $FILE to $ZIP"
-  if [ "$GETEXT" == "apk" ]
-    then
-      if [ ! -f ./$FILE ]
-        then
-          echo "File \"$FILE\" not found."
-          exit 1
-      elif [ -f ./$ZIP ]
-        then
-          echo "File \"$ZIP\" already exists."
-          exit 1
-      else
-          cp $FILE $ZIP
-          echo "Created file $ZIP"
-      fi
-  elif [ -z "$GETEXT" ]
-    then
-      echo "Please supply filename to convert."
-      exit 1
-  else
-      echo "This program only takes .apk files."
-      exit 1
-  fi
+# a2z operations
+    echo "Converting $FILE to $ZIP"
+    if [ "$GETEXT" == "apk" ]
+      then
+        if [ ! -f ./$FILE ]
+          then
+            echo "File \"$FILE\" not found."
+            exit 1
+        elif [ -f ./$ZIP ]
+          then
+            echo "File \"$ZIP\" already exists."
+            exit 1
+        else
+            cp $FILE $ZIP
+            echo "Created file $ZIP"
+        fi
+    elif [ -z "$GETEXT" ]
+      then
+        echo "Please supply filename to convert."
+        exit 1
+    else
+        echo "This program only takes .apk files."
+        exit 1
+    fi
 
 # dex2jar operations
     if [ $? -ne 1 ]
       then
         echo "d2j $ZIP"
         d2j $ZIP
-	echo "Converted dex file from $ZIP to .jar."
+        echo "Converted dex file from $ZIP to .jar."
     else 
-	ERROR="dex2jar"
-	echo "Halted at $ERROR."
-	exit 1
+        ERROR="dex2jar"
+        echo "Halted at $ERROR."
+        exit 1
     fi
 
 # apktool operations
@@ -56,10 +56,10 @@ else
       then
         echo "apktool d $FILE"
         apktool d $FILE
-	echo "Decompiled $FILE with apktool."
+        echo "Decompiled $FILE with apktool."
     else 
-	ERROR="apktool"
-	echo "Halted at $ERROR."
-	exit 1
+        ERROR="apktool"
+        echo "Halted at $ERROR."
+        exit 1
     fi
 fi
