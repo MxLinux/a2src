@@ -1,12 +1,12 @@
 #!/bin/bash
 
+FILE="$1"
+GETEXT="${FILE##*.}"
+NOEXT=${FILE%.apk}
+ZIP=$NOEXT.zip
+
 shopt -s expand_aliases
 source ~/.bash_profile
-
-FILE=$1
-GETEXT="${FILE##*.}"
-NOEXT="${FILE%.*}"
-ERROR="a2z"
 
 if [ -z $1 ]
   then
@@ -15,15 +15,36 @@ if [ -z $1 ]
     exit 1
 else
   # a2z operations
-  echo "a2z $FILE"
-  a2z $FILE
+  echo "Converting $FILE to $ZIP"
+  if [ "$GETEXT" == "apk" ]
+    then
+      if [ ! -f ./$FILE ]
+        then
+          echo "File \"$FILE\" not found."
+          exit 1
+      elif [ -f ./$ZIP ]
+        then
+          echo "File \"$ZIP\" already exists."
+          exit 1
+      else
+          cp $FILE $ZIP
+          echo "Created file $ZIP"
+      fi
+  elif [ -z "$GETEXT" ]
+    then
+      echo "Please supply filename to convert."
+      exit 1
+  else
+      echo "This program only takes .apk files."
+      exit 1
+  fi
 
 # dex2jar operations
-    if [ $? -eq 0 ]
+    if [ $? -ne 1 ]
       then
-        echo "d2j $NOEXT.zip"
-        d2j $NOEXT.zip
-	echo "Converted dex file from $NOEXT.zip to .jar."
+        echo "d2j $ZIP"
+        d2j $ZIP
+	echo "Converted dex file from $ZIP to .jar."
     else 
 	ERROR="dex2jar"
 	echo "Halted at $ERROR."
@@ -31,7 +52,7 @@ else
     fi
 
 # apktool operations
-    if [ $? -eq 0 ]
+    if [ $? -ne 1 ]
       then
         echo "apktool d $FILE"
         apktool d $FILE
