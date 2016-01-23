@@ -1,1 +1,144 @@
-../../Android/a2src
+#!/bin/bash
+
+# You can set locations for the software as variables in .a2var, 
+# or as an environmental variable. We'll check first to make
+# sure they're all set.
+
+VARFILE="~/.a2var"
+
+if [ ! -f $VARFILE ]
+  then
+    touch $VARFILE
+    source $VARFILE
+    echo "Creating configuration file..."
+else
+    source $VARFILE
+fi
+
+FILE="$1"
+GETEXT="${FILE##*.}"
+NOEXT=${FILE%.apk}
+ZIP=$NOEXT.zip
+
+# Functions
+chk_apkt ()
+{
+if [ -z $APKTOOL ]
+  then
+    echo "Location for apktool binary not set."
+    read -r -p "Please enter location for apktool binary: " APKT_LOC
+    while [ ! -f $APKT_LOC ]
+      do
+        read -r -p "File not found at $APKT_LOC, please try again: " APKT_LOC
+        ls $APKT_LOC
+        pwd
+        echo $APKT_LOC
+      done
+    echo "APKTOOL=\"$APKT_LOC\"" >> .a2var;
+  fi
+}
+
+chk_d2j ()
+{
+if [ -z $DEX2JAR ]
+  then
+    echo "Location for dex2jar binary not set."
+    read -r -p "Please enter location for dex2jar binary: " D2J_LOC
+    while [ ! -f $D2J_LOC ]
+      do
+        read -r -p "File not found at $D2J_LOC, please try again: " D2J_LOC
+      done
+    echo "DEX2JAR=\"$D2J_LOC\"" >> .a2var;
+  fi
+}
+
+chk_jadx ()
+{
+if [ -z $USE_JADX ]
+  then
+    read -r -p "Use jadx to view source? [Y/n]" CONF
+    case $CONF in
+      [Yy]* ) echo "Setting saved.";
+              read -r -p "Please enter location for jadx binary: " JADX_LOC
+              while [ ! -f $JADX_LOC ]
+                do
+                  read -r -p "File not found at $JADX_LOC, please try again: " JADX_LOC
+                done
+              echo "JADX=\"$JADX_LOC\"" >> .a2var
+              echo "USE_JADX=\"yes\"" >> .a2var;;
+      [Nn]* ) echo "Setting saved.";;
+    esac
+  fi
+}
+
+use_jadx ()
+{
+if [ $USE_JADX == "yes" ]
+  then
+    # jadx <src>
+    echo "Don't forget to fill this in!"
+else 
+    echo "Skipping jadx. Modify values in .a2var to change this setting."
+fi
+}
+
+convert ()
+{
+if [ -z $FILE ]
+  then
+    echo "a2src Android app decompilation script."
+    echo "Usage: a2src [file.apk]"
+    echo "Copyright (C) 2015 Shea Ramage."
+    echo "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>"
+    exit 1
+else
+# a2z operations
+    echo "Converting $FILE to $ZIP"
+    if [ "$GETEXT" == "apk" ]
+      then
+        if [ ! -f ./$FILE ]
+          then
+            echo "File \"$FILE\" not found."
+              exit 1
+        elif [ -f ./$ZIP ]
+          then
+            echo "File \"$ZIP\" already exists."
+            exit 1
+        else
+            cp $FILE $ZIP
+            echo "Created file $ZIP"
+        fi
+    else
+        echo "This program only takes .apk files."
+        exit 1
+    fi
+
+# dex2jar operations
+    if [ $? -ne 1 ]
+      then
+        echo "d2j $ZIP"
+        $DEX2JAR $ZIP
+        echo "Converted dex file from $ZIP to .jar."
+    else 
+        echo "Halted at dex2jar"
+        exit 1
+    fi
+
+# apktool operations
+    if [ $? -ne 1 ]
+      then
+        echo "apktool d $FILE"
+        $APKTOOL d $FILE
+        echo "Decompiled $FILE with apktool."
+    else 
+        echo "Halted at apktool"
+        exit 1
+    fi
+  fi
+}
+
+chk_apkt
+chk_d2j
+chk_jadx
+convert
+use_jadx
