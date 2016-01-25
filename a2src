@@ -9,7 +9,6 @@ VARFILE="~/.a2var"
 if [ ! -f $VARFILE ]
   then
     touch $VARFILE
-    source $VARFILE
     echo "Creating configuration file..."
 else
     source $VARFILE
