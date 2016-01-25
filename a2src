@@ -34,7 +34,7 @@ if [ -z $APKTOOL ]
         pwd
         echo $APKT_LOC
       done
-    echo "APKTOOL=\"$APKT_LOC\"" >> .a2var;
+    echo "APKTOOL=\"$APKT_LOC\"" >> $VARFILE;
   fi
 }
 
@@ -48,7 +48,7 @@ if [ -z $DEX2JAR ]
       do
         read -r -p "File not found at $D2J_LOC, please try again: " D2J_LOC
       done
-    echo "DEX2JAR=\"$D2J_LOC\"" >> .a2var;
+    echo "DEX2JAR=\"$D2J_LOC\"" >> $VARFILE;
   fi
 }
 
@@ -64,8 +64,8 @@ if [ -z $USE_JADX ]
                 do
                   read -r -p "File not found at $JADX_LOC, please try again: " JADX_LOC
                 done
-              echo "JADX=\"$JADX_LOC\"" >> .a2var
-              echo "USE_JADX=\"yes\"" >> .a2var;;
+              echo "JADX=\"$JADX_LOC\"" >> $VARFILE
+              echo "USE_JADX=\"yes\"" >> $VARFILE;;
       [Nn]* ) echo "Setting saved.";;
     esac
   fi
